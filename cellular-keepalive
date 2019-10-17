@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PING_TARGET="8.8.8.8"
-PING_COUNT="3"
+PING_COUNT="10"
 LOG_FILE="/dev/shm/record"
 QMI_NODE="/dev/cdc-wdm0"
 #QMI_IF="wwan0"
@@ -15,8 +15,12 @@ keep_alive () {
 	do
 		err_cnt=$(($err_cnt+1))
 		err_chk $err_cnt
-		cell_mgmt restart
-		sleep 10
+		cell_mgmt stop
+		sleep 5
+		cell_mgmt start
+		sleep 2
+		cell_mgmt start
+		sleep 15
 		# ifconfig ${QMI_IF} mtu 1500
 		date=$(date +"%Y/%m/%d %H:%M:%S")
 		echo "$date Cannot ping $PING_TARGET, restart the connection..." > $LOG_FILE
@@ -42,7 +46,12 @@ log_data () {
 		err_cnt=$(($err_cnt+1))
 		err_chk $err_cnt
 		if [ x"$status" == x"disconnected" ]; then
-			cell_mgmt restart
+			cell_mgmt stop
+			sleep 5
+			cell_mgmt start
+			sleep 2
+			cell_mgmt start
+			sleep 10
 			# ifconfig ${QMI_IF} mtu 1500
 			date=$(date +"%Y/%m/%d %H:%M:%S")
 			echo "$date Cannot reach AP anymore, restart the connection..." > $LOG_FILE
